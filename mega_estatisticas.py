@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 from collections import Counter
 
@@ -39,3 +38,22 @@ def graficos_estatisticos():
     ax.set_xlabel("Dezena")
     ax.set_ylabel("Frequência")
     return fig
+
+def calcular_estatisticas(historico):
+    if not historico:
+        return "Nenhum histórico de jogos disponível."
+
+    estatisticas = {
+        "Dezenas mais sorteadas": dezenas_mais_sorteadas(historico),
+        "Dezenas menos sorteadas": dezenas_menos_sorteadas(historico),
+    }
+
+    # Estatísticas adicionais com base no último jogo
+    ultimo_jogo = historico[-1]
+    estatisticas.update({
+        "Pares e Ímpares (último jogo)": pares_impares(ultimo_jogo),
+        "Soma das dezenas (último jogo)": soma_dezenas(ultimo_jogo),
+        "Distribuição (último jogo)": distribuicao_linha_coluna(ultimo_jogo)
+    })
+
+    return estatisticas
