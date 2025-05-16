@@ -1,5 +1,4 @@
 import streamlit as st
-import requests
 from gerador_megasena import gerar_cartoes
 from util import exportar_pdf, exportar_txt
 from mega_estatisticas import (
@@ -22,35 +21,14 @@ def comparar_com_ultimo(cartao, resultado):
     acertos = set(cartao) & set(resultado)
     return sorted(acertos), len(acertos)
 
-def obter_ultimos_resultados_reais(qtd=10, concurso_inicial=2863):
-    base_url = "https://loteriascaixa-api.litowl.com/api/v1/mega-sena"
-    try:
-        ultimos = []
-        for i in range(qtd):
-            concurso = concurso_inicial - i
-            resposta = requests.get(f"{base_url}/{concurso}")
-            if resposta.status_code == 200:
-                dados = resposta.json()
-                dezenas = list(map(int, dados['numeros']))
-                ultimos.append((concurso, sorted(dezenas)))
-            else:
-                ultimos.append((concurso, f"Erro {resposta.status_code}"))
-        return ultimos
-    except Exception as e:
-        return f"Erro na requisição: {str(e)}"
-
-# Configuração da página
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
 st.title("🎯 Gerador Inteligente de Cartões da Mega-Sena")
 
-# Quantidade de cartões
 quantidade = st.slider("Quantos cartões deseja gerar?", 1, 10, 1)
 
-# Histórico na sessão
 if "historico" not in st.session_state:
     st.session_state.historico = []
 
-# Botão para gerar cartões
 if st.button("🎰 Gerar Cartões"):
     cartoes = gerar_cartoes(quantidade)
     st.session_state.historico.extend(cartoes)
@@ -64,7 +42,24 @@ if st.button("🎰 Gerar Cartões"):
             texto += f" | 🎯 {qtd} acertos: {', '.join(map(str, acertos)) if acertos else 'nenhum'}"
         st.success(texto)
 
-# Exportar jogos
+st.markdown("---")
+st.subheader("📊 Estatísticas dos Cartões Gerados")
+
+if st.session_state.historico:
+    mais_sorteadas = dezenas_mais_sorteadas(st.session_state.historico)
+    menos_sorteadas = dezenas_menos_sorteadas(st.session_state.historico)
+
+    st.write("🔝 Dezenas mais sorteadas:")
+    for dezena, freq in mais_sorteadas:
+        st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+
+    st.write("🔻 Dezenas menos sorteadas:")
+    for dezena, freq in menos_sorteadas:
+        st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+
+    fig = graficos_estatisticos()
+    st.pyplot(fig)
+
 st.markdown("---")
 st.subheader("📥 Exportar Jogos")
 
@@ -81,41 +76,22 @@ if st.session_state.historico:
 else:
     st.info("Gere pelo menos um cartão para exportar.")
 
-# Estatísticas
-st.markdown("---")
-st.subheader("📊 Estatísticas Inteligentes")
-
-if st.session_state.historico:
-    mais = dezenas_mais_sorteadas(st.session_state.historico)
-    menos = dezenas_menos_sorteadas(st.session_state.historico)
-
-    st.write("🔝 **Dezenas mais sorteadas nos seus jogos:**")
-    st.write(", ".join(f"{dezena[0]} ({dezena[1]}x)" for dezena in mais))
-
-    st.write("🔻 **Dezenas menos sorteadas nos seus jogos:**")
-    st.write(", ".join(f"{dezena[0]} ({dezena[1]}x)" for dezena in menos))
-
-    ultimo = ler_ultimo_resultado()
-    if ultimo:
-        st.write("⚖️ " + pares_impares(ultimo))
-        st.write("➕ " + soma_dezenas(ultimo))
-        st.write("📐 " + distribuicao_linha_coluna(ultimo))
-
-    st.pyplot(graficos_estatisticos())
-else:
-    st.info("Gere alguns cartões para ver as estatísticas.")
-
-# Últimos resultados reais
+# 🔟 Últimos 10 resultados da Mega-Sena (dados reais manualmente adicionados)
 st.markdown("---")
 st.subheader("🎲 Últimos 10 Resultados da Mega-Sena (Reais)")
 
-resultados_reais = obter_ultimos_resultados_reais()
+ultimos_resultados = [
+    (2863, [5, 23, 32, 34, 47, 56]),
+    (2862, [2, 4, 14, 18, 22, 44]),
+    (2861, [2, 21, 27, 46, 51, 53]),
+    (2860, [2, 5, 17, 24, 38, 57]),
+    (2859, [7, 8, 15, 17, 20, 51]),
+    (2858, [8, 18, 27, 28, 48, 52]),
+    (2857, [2, 18, 28, 38, 41, 50]),
+    (2856, [3, 5, 10, 27, 38, 48]),
+    (2855, [12, 16, 24, 31, 51, 55]),
+    (2854, [2, 13, 16, 31, 44, 55]),
+]
 
-if isinstance(resultados_reais, list):
-    for concurso, dezenas in resultados_reais:
-        if isinstance(dezenas, list):
-            st.markdown(f"**Concurso {concurso}:** {' - '.join(f'{d:02}' for d in dezenas)}")
-        else:
-            st.error(f"Concurso {concurso}: {dezenas}")
-else:
-    st.error(resultados_reais)
+for concurso, dezenas in ultimos_resultados:
+    st.markdown(f"**Concurso {concurso}:** {' - '.join(f'{d:02}' for d in dezenas)}")
