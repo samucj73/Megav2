@@ -7,7 +7,7 @@ from mega_estatisticas import (
 )
 import matplotlib.pyplot as plt
 from collections import Counter
-import itertools
+import random
 
 # ================== CONFIGURAÇÕES ==================
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
@@ -52,22 +52,27 @@ if "historico" not in st.session_state:
 
 # ================== GERADOR DE CARTÕES ==================
 def gerar_cartoes_com_base(escolhas_usuario, qtd):
-    # Pega todas as dezenas dos 10 últimos concursos
     dezenas_reais = [dez for _, dez in ultimos_resultados]
     todas = [n for sub in dezenas_reais for n in sub]
     contagem = Counter(todas)
-    mais_frequentes = [d for d, _ in contagem.most_common(20)]
+    mais_frequentes = [d for d, _ in contagem.most_common(30)]
 
-    # Remove fixas do conjunto restante
     restantes = [d for d in mais_frequentes if d not in escolhas_usuario]
-    num_para_completar = 6 - len(escolhas_usuario)
+    todos_disponiveis = list(set(range(1, 61)) - set(escolhas_usuario))
 
     cartoes = []
     for _ in range(qtd):
-        complemento = sorted(itertools.islice(itertools.cycle(restantes), num_para_completar))
-        cartao = sorted(set(escolhas_usuario + complemento)[:6])
+        complemento_pool = [n for n in restantes if n not in escolhas_usuario]
+        complemento = random.sample(complemento_pool, k=6 - len(escolhas_usuario)) if complemento_pool else []
+        cartao = sorted(set(escolhas_usuario + complemento))
+        
+        # Se ainda assim não tiver 6 dezenas (por algum erro de lógica), completa com aleatórias
+        while len(cartao) < 6:
+            dez_aleatoria = random.choice([n for n in todos_disponiveis if n not in cartao])
+            cartao.append(dez_aleatoria)
+            cartao = sorted(cartao)
+
         cartoes.append(cartao)
-        restantes = restantes[1:] + restantes[:1]  # rotate
 
     return cartoes
 
