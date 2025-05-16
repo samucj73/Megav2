@@ -4,11 +4,9 @@ from util import exportar_pdf, exportar_txt
 from mega_estatisticas import (
     dezenas_mais_sorteadas,
     dezenas_menos_sorteadas,
-    pares_impares,
-    soma_dezenas,
-    distribuicao_linha_coluna,
-    graficos_estatisticos
 )
+import matplotlib.pyplot as plt
+from collections import Counter
 
 def ler_ultimo_resultado():
     try:
@@ -42,41 +40,7 @@ if st.button("🎰 Gerar Cartões"):
             texto += f" | 🎯 {qtd} acertos: {', '.join(map(str, acertos)) if acertos else 'nenhum'}"
         st.success(texto)
 
-st.markdown("---")
-st.subheader("📊 Estatísticas dos Cartões Gerados")
-
-if st.session_state.historico:
-    mais_sorteadas = dezenas_mais_sorteadas(st.session_state.historico)
-    menos_sorteadas = dezenas_menos_sorteadas(st.session_state.historico)
-
-    st.write("🔝 Dezenas mais sorteadas:")
-    for dezena, freq in mais_sorteadas:
-        st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
-
-    st.write("🔻 Dezenas menos sorteadas:")
-    for dezena, freq in menos_sorteadas:
-        st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
-
-    fig = graficos_estatisticos()
-    st.pyplot(fig)
-
-st.markdown("---")
-st.subheader("📥 Exportar Jogos")
-
-if st.session_state.historico:
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬇️ Exportar .TXT"):
-            caminho = exportar_txt(st.session_state.historico)
-            st.success(f"Arquivo salvo como: {caminho}")
-    with col2:
-        if st.button("⬇️ Exportar .PDF"):
-            caminho = exportar_pdf(st.session_state.historico)
-            st.success(f"Arquivo salvo como: {caminho}")
-else:
-    st.info("Gere pelo menos um cartão para exportar.")
-
-# 🔟 Últimos 10 resultados da Mega-Sena (dados reais manualmente adicionados)
+# 🔟 Últimos 10 resultados reais da Mega-Sena
 st.markdown("---")
 st.subheader("🎲 Últimos 10 Resultados da Mega-Sena (Reais)")
 
@@ -95,3 +59,52 @@ ultimos_resultados = [
 
 for concurso, dezenas in ultimos_resultados:
     st.markdown(f"**Concurso {concurso}:** {' - '.join(f'{d:02}' for d in dezenas)}")
+
+# 📊 Estatísticas com base nos últimos concursos reais
+st.markdown("---")
+st.subheader("📊 Estatísticas com Base nos Últimos 10 Concursos Reais")
+
+# Extrai dezenas dos concursos
+dezenas_reais = [dezenas for _, dezenas in ultimos_resultados]
+todas_dezenas = [num for dezenas in dezenas_reais for num in dezenas]
+
+# Estatísticas
+mais_sorteadas = dezenas_mais_sorteadas(dezenas_reais)
+menos_sorteadas = dezenas_menos_sorteadas(dezenas_reais)
+
+st.write("🔝 Dezenas mais sorteadas nos últimos 10 concursos:")
+for dezena, freq in mais_sorteadas:
+    st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+
+st.write("🔻 Dezenas menos sorteadas nos últimos 10 concursos:")
+for dezena, freq in menos_sorteadas:
+    st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+
+# Gráfico de frequência
+contagem = Counter(todas_dezenas)
+dezenas_ordenadas = sorted(contagem.keys())
+frequencias = [contagem[d] for d in dezenas_ordenadas]
+
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.bar(dezenas_ordenadas, frequencias, color='darkgreen')
+ax.set_title("Frequência das Dezenas - Últimos 10 Concursos")
+ax.set_xlabel("Dezena")
+ax.set_ylabel("Frequência")
+st.pyplot(fig)
+
+# 📥 Exportação
+st.markdown("---")
+st.subheader("📥 Exportar Jogos")
+
+if st.session_state.historico:
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("⬇️ Exportar .TXT"):
+            caminho = exportar_txt(st.session_state.historico)
+            st.success(f"Arquivo salvo como: {caminho}")
+    with col2:
+        if st.button("⬇️ Exportar .PDF"):
+            caminho = exportar_pdf(st.session_state.historico)
+            st.success(f"Arquivo salvo como: {caminho}")
+else:
+    st.info("Gere pelo menos um cartão para exportar.")
