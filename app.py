@@ -19,9 +19,12 @@ def comparar_com_ultimo(cartao, resultado):
     acertos = set(cartao) & set(resultado)
     return sorted(acertos), len(acertos)
 
+# CONFIGURAÇÃO DE PÁGINA
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
-st.title("🎯 Gerador Inteligente de Cartões da Mega-Sena")
+st.markdown("<h1 style='text-align: center; color: green;'>🎯 Gerador Inteligente de Cartões da Mega-Sena</h1>", unsafe_allow_html=True)
 
+# INTERAÇÃO
+st.markdown("---")
 quantidade = st.slider("Quantos cartões deseja gerar?", 1, 10, 1)
 
 if "historico" not in st.session_state:
@@ -40,9 +43,9 @@ if st.button("🎰 Gerar Cartões"):
             texto += f" | 🎯 {qtd} acertos: {', '.join(map(str, acertos)) if acertos else 'nenhum'}"
         st.success(texto)
 
-# 🔟 Últimos 10 resultados reais da Mega-Sena
+# RESULTADOS REAIS
 st.markdown("---")
-st.subheader("🎲 Últimos 10 Resultados da Mega-Sena (Reais)")
+st.markdown("<h2 style='text-align: center;'>🎲 Últimos 10 Resultados da Mega-Sena (Reais)</h2>", unsafe_allow_html=True)
 
 ultimos_resultados = [
     (2863, [5, 23, 32, 34, 47, 56]),
@@ -58,29 +61,27 @@ ultimos_resultados = [
 ]
 
 for concurso, dezenas in ultimos_resultados:
-    st.markdown(f"**Concurso {concurso}:** {' - '.join(f'{d:02}' for d in dezenas)}")
+    st.markdown(f"<div style='text-align:center'><strong>Concurso {concurso}:</strong> {' - '.join(f'{d:02}' for d in dezenas)}</div>", unsafe_allow_html=True)
 
-# 📊 Estatísticas com base nos últimos concursos reais
+# ESTATÍSTICAS
 st.markdown("---")
-st.subheader("📊 Estatísticas com Base nos Últimos 10 Concursos Reais")
+st.markdown("<h2 style='text-align: center;'>📊 Estatísticas com Base nos Últimos 10 Concursos</h2>", unsafe_allow_html=True)
 
-# Extrai dezenas dos concursos
 dezenas_reais = [dezenas for _, dezenas in ultimos_resultados]
 todas_dezenas = [num for dezenas in dezenas_reais for num in dezenas]
 
-# Estatísticas
 mais_sorteadas = dezenas_mais_sorteadas(dezenas_reais)
 menos_sorteadas = dezenas_menos_sorteadas(dezenas_reais)
 
-st.write("🔝 Dezenas mais sorteadas nos últimos 10 concursos:")
+st.markdown("#### 🔝 Dezenas mais sorteadas:")
 for dezena, freq in mais_sorteadas:
-    st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+    st.markdown(f"<div style='padding-left:20px'>👉 Dezena {dezena:02} apareceu {freq} vezes.</div>", unsafe_allow_html=True)
 
-st.write("🔻 Dezenas menos sorteadas nos últimos 10 concursos:")
+st.markdown("#### 🔻 Dezenas menos sorteadas:")
 for dezena, freq in menos_sorteadas:
-    st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
+    st.markdown(f"<div style='padding-left:20px'>👉 Dezena {dezena:02} apareceu {freq} vezes.</div>", unsafe_allow_html=True)
 
-# Gráfico de frequência
+# GRÁFICO
 contagem = Counter(todas_dezenas)
 dezenas_ordenadas = sorted(contagem.keys())
 frequencias = [contagem[d] for d in dezenas_ordenadas]
@@ -92,9 +93,9 @@ ax.set_xlabel("Dezena")
 ax.set_ylabel("Frequência")
 st.pyplot(fig)
 
-# 📥 Exportação
+# EXPORTAÇÃO
 st.markdown("---")
-st.subheader("📥 Exportar Jogos")
+st.markdown("<h2 style='text-align: center;'>📥 Exportar Jogos</h2>", unsafe_allow_html=True)
 
 if st.session_state.historico:
     col1, col2 = st.columns(2)
@@ -108,3 +109,12 @@ if st.session_state.historico:
             st.success(f"Arquivo salvo como: {caminho}")
 else:
     st.info("Gere pelo menos um cartão para exportar.")
+
+# RODAPÉ
+st.markdown("---")
+st.markdown(
+    "<div style='text-align:center; color: gray; padding-top:20px;'>"
+    "Desenvolvido por <strong>SAMUCJ TECHNOLOGY</strong> © 2025"
+    "</div>",
+    unsafe_allow_html=True,
+)
