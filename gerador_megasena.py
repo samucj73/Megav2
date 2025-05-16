@@ -1,10 +1,7 @@
-
 import random
 
+def gerar_cartao():
+    return sorted(random.sample(range(1, 61), 6))
+
 def gerar_cartoes(qtd):
-    cartoes = []
-    while len(cartoes) < qtd:
-        cartao = sorted(random.sample(range(1, 61), 6))
-        if cartao not in cartoes:
-            cartoes.append(cartao)
-    return cartoes
+    return [gerar_cartao() for _ in range(qtd)]
