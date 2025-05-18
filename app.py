@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 from collections import Counter
@@ -147,7 +146,11 @@ if len(ultimos_resultados) >= 2:
     primos_list = primos(todas_dezenas)
     fib_list = fibonacci(todas_dezenas)
     quad_perfeitos = quadrados_perfeitos(todas_dezenas)
-    repetidas = repetidas_concurso_anterior(ultimos_resultados)
+
+    ultimo = ultimos_resultados[-1][1]
+    penultimo = ultimos_resultados[-2][1]
+    repetidas = repetidas_concurso_anterior(ultimo, penultimo)
+
     linhas, colunas = distribuicao_linhas_colunas(todas_dezenas)
     sequencias = encontrar_sequencias(todas_dezenas)
     duplas, triplas = contar_duplas_triplas(todas_dezenas)
