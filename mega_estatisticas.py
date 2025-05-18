@@ -37,7 +37,6 @@ def quadrados_perfeitos(dezenas):
     return [d for d in dezenas if int(math.sqrt(d))**2 == d]
 
 def repetidas_concurso_anterior(ultimo, penultimo):
-    """Compara dezenas do último e penúltimo concurso."""
     return sorted(set(ultimo) & set(penultimo))
 
 def distribuicao_linhas_colunas(dezenas):
@@ -75,3 +74,34 @@ def contar_duplas_triplas(dezenas):
     duplas = sum(1 for grupo in list(linhas.values()) + list(colunas.values()) if len(grupo) == 2)
     triplas = sum(1 for grupo in list(linhas.values()) + list(colunas.values()) if len(grupo) == 3)
     return duplas, triplas
+
+# NOVAS FUNÇÕES AVANÇADAS
+
+def multiplos(dezenas, base):
+    return [d for d in dezenas if d % base == 0]
+
+def finais(dezenas):
+    finais_contagem = {i: 0 for i in range(10)}
+    for d in dezenas:
+        finais_contagem[d % 10] += 1
+    return finais_contagem
+
+def distribuicao_faixas(dezenas):
+    faixas = {
+        "1–20": 0,
+        "21–40": 0,
+        "41–60": 0
+    }
+    for d in dezenas:
+        if 1 <= d <= 20:
+            faixas["1–20"] += 1
+        elif 21 <= d <= 40:
+            faixas["21–40"] += 1
+        elif 41 <= d <= 60:
+            faixas["41–60"] += 1
+    return faixas
+
+def altas_baixas(dezenas):
+    altas = [d for d in dezenas if d > 30]
+    baixas = [d for d in dezenas if d <= 30]
+    return len(altas), len(baixas)
