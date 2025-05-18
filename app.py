@@ -1,3 +1,4 @@
+
 import streamlit as st
 import requests
 from collections import Counter
@@ -137,18 +138,16 @@ st.pyplot(fig)
 st.markdown("---")
 st.subheader("📈 Estatísticas Avançadas")
 
-if ultimos_resultados:
-    dezenas_atuais = [d for _, d in ultimos_resultados]
-    todas_dezenas = [n for sub in dezenas_atuais for n in sub]
-    ultimo_concurso = ultimos_resultados[0][1] if ultimos_resultados else []
-    penultimo_concurso = ultimos_resultados[1][1] if len(ultimos_resultados) > 1 else []
+if len(ultimos_resultados) >= 2:
+    dezenas_reais = [dezenas for _, dezenas in ultimos_resultados]
+    todas_dezenas = [num for dezenas in dezenas_reais for num in dezenas]
 
     pares, impares = pares_impares(todas_dezenas)
     soma = soma_total(todas_dezenas)
     primos_list = primos(todas_dezenas)
     fib_list = fibonacci(todas_dezenas)
     quad_perfeitos = quadrados_perfeitos(todas_dezenas)
-    repetidas = repetidas_concurso_anterior(ultimo_concurso, penultimo_concurso)
+    repetidas = repetidas_concurso_anterior(ultimos_resultados)
     linhas, colunas = distribuicao_linhas_colunas(todas_dezenas)
     sequencias = encontrar_sequencias(todas_dezenas)
     duplas, triplas = contar_duplas_triplas(todas_dezenas)
@@ -158,12 +157,11 @@ if ultimos_resultados:
     st.write(f"⭐ Dezenas Primas: {', '.join(map(str, primos_list))}")
     st.write(f"🔮 Dezenas Fibonacci: {', '.join(map(str, fib_list))}")
     st.write(f"🔲 Quadrados Perfeitos: {', '.join(map(str, quad_perfeitos))}")
-    st.write(f"🔄 Dezenas repetidas do último concurso: {', '.join(map(str, repetidas))}")
+    st.write(f"🔄 Dezenas repetidas do último para o penúltimo concurso: {', '.join(map(str, repetidas))}")
     st.write(f"📊 Distribuição por linhas: {linhas}")
     st.write(f"📊 Distribuição por colunas: {colunas}")
     st.write(f"🔗 Sequências encontradas: {sequencias}")
     st.write(f"📈 Duplas: {duplas} | Triplas: {triplas}")
-
 else:
     st.info("Não há resultados suficientes para análises avançadas.")
 
