@@ -1,13 +1,15 @@
 import streamlit as st
+import requests
+from collections import Counter
+import matplotlib.pyplot as plt
+import random
+
 from gerador_megasena import gerar_cartoes
 from util import exportar_pdf, exportar_txt
 from mega_estatisticas import (
     dezenas_mais_sorteadas,
     dezenas_menos_sorteadas,
 )
-import matplotlib.pyplot as plt
-from collections import Counter
-import random
 
 # ================== CONFIGURAÇÕES ==================
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
@@ -15,10 +17,34 @@ st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
 # ================== FUNÇÕES AUXILIARES ==================
 def ler_ultimo_resultado():
     try:
-        with open("resultados.txt", "r") as f:
-            return sorted([int(x) for x in f.read().strip().split()])
+        url = 'https://api.guidi.dev.br/loteria/megasena/ultimo'
+        response = requests.get(url)
+        response.raise_for_status()
+        dados = response.json()
+        dezenas = dados.get('listaDezenas', [])
+        return sorted([int(d) for d in dezenas])
     except:
         return []
+
+def carregar_ultimos_concursos(qtd=10):
+    concursos = []
+    try:
+        url_base = 'https://api.guidi.dev.br/loteria/megasena/'
+        # Obtém o número do último concurso
+        response = requests.get(url_base + 'ultimo')
+        response.raise_for_status()
+        ultimo = response.json().get('numero')
+
+        for numero in range(ultimo, ultimo - qtd, -1):
+            r = requests.get(f'{url_base}{numero}')
+            r.raise_for_status()
+            dados = r.json()
+            dezenas = [int(d) for d in dados.get('listaDezenas', [])]
+            concursos.append((numero, dezenas))
+
+    except Exception as e:
+        st.error(f"Erro ao carregar concursos: {e}")
+    return concursos
 
 def comparar_com_ultimo(cartao, resultado):
     acertos = set(cartao) & set(resultado)
@@ -32,19 +58,8 @@ st.markdown("<p style='text-align: center;'>Gerador de cartões, estatísticas e
 quantidade = st.slider("🎫 Quantos cartões deseja gerar?", 1, 10, 1)
 escolhas_usuario = st.multiselect("🔢 Escolha suas dezenas fixas (opcional):", list(range(1, 61)))
 
-# ================== ÚLTIMOS RESULTADOS ==================
-ultimos_resultados = [
-    (2863, [5, 23, 32, 34, 47, 56]),
-    (2862, [2, 4, 14, 18, 22, 44]),
-    (2861, [2, 21, 27, 46, 51, 53]),
-    (2860, [2, 5, 17, 24, 38, 57]),
-    (2859, [7, 8, 15, 17, 20, 51]),
-    (2858, [8, 18, 27, 28, 48, 52]),
-    (2857, [2, 18, 28, 38, 41, 50]),
-    (2856, [3, 5, 10, 27, 38, 48]),
-    (2855, [12, 16, 24, 31, 51, 55]),
-    (2854, [2, 13, 16, 31, 44, 55]),
-]
+# ================== CARREGAR RESULTADOS REAIS ==================
+ultimos_resultados = carregar_ultimos_concursos()
 
 # ================== HISTÓRICO DE JOGOS ==================
 if "historico" not in st.session_state:
@@ -65,8 +80,7 @@ def gerar_cartoes_com_base(escolhas_usuario, qtd):
         complemento_pool = [n for n in restantes if n not in escolhas_usuario]
         complemento = random.sample(complemento_pool, k=6 - len(escolhas_usuario)) if complemento_pool else []
         cartao = sorted(set(escolhas_usuario + complemento))
-        
-        # Se ainda assim não tiver 6 dezenas (por algum erro de lógica), completa com aleatórias
+
         while len(cartao) < 6:
             dez_aleatoria = random.choice([n for n in todos_disponiveis if n not in cartao])
             cartao.append(dez_aleatoria)
