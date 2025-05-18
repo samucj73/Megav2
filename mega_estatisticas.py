@@ -34,16 +34,19 @@ def fibonacci(dezenas):
 def quadrados_perfeitos(dezenas):
     return [d for d in dezenas if int(math.sqrt(d))**2 == d]
 
-def repetidas_concurso_anterior(dezenas, ultimos_resultados):
-    if not ultimos_resultados:
+def repetidas_concurso_anterior(dezenas_reais):
+    if len(dezenas_reais) < 2:
         return []
-    # Obtém as dezenas do último concurso
-    _, dezenas_ultimo = ultimos_resultados[0]
-    return sorted(set(dezenas) & set(dezenas_ultimo))
+    atual = set(dezenas_reais[-1])
+    anterior = set(dezenas_reais[-2])
+    return sorted(atual & anterior)
 
-def distribuicao_linhas_colunas(dezenas):
-    linhas = {i: 0 for i in range(1, 7)}   # linhas 1 a 6
-    colunas = {i: 0 for i in range(1, 11)} # colunas 1 a 10
+def distribuicao_linhas_colunas(dezenas_reais):
+    if not dezenas_reais:
+        return {}, {}
+    dezenas = dezenas_reais[-1]
+    linhas = {i: 0 for i in range(1, 7)}
+    colunas = {i: 0 for i in range(1, 11)}
     for d in dezenas:
         linha = ((d - 1) // 10) + 1
         coluna = ((d - 1) % 10) + 1
@@ -51,8 +54,10 @@ def distribuicao_linhas_colunas(dezenas):
         colunas[coluna] += 1
     return linhas, colunas
 
-def encontrar_sequencias(dezenas):
-    dezenas = sorted(dezenas)
+def encontrar_sequencias(dezenas_reais):
+    if not dezenas_reais:
+        return []
+    dezenas = sorted(dezenas_reais[-1])
     sequencias = []
     seq = [dezenas[0]]
     for i in range(1, len(dezenas)):
@@ -66,7 +71,10 @@ def encontrar_sequencias(dezenas):
         sequencias.append(seq)
     return sequencias
 
-def contar_duplas_triplas(dezenas):
+def contar_duplas_triplas(dezenas_reais):
+    if not dezenas_reais:
+        return 0, 0
+    dezenas = dezenas_reais[-1]
     linhas, colunas = {}, {}
     for d in dezenas:
         linha = ((d - 1) // 10) + 1
