@@ -14,10 +14,8 @@ from mega_estatisticas import (
     contar_duplas_triplas
 )
 
-# ================== CONFIGURAÇÕES ==================
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
 
-# ================== FUNÇÕES AUXILIARES ==================
 def ler_ultimo_resultado():
     try:
         url = 'https://api.guidi.dev.br/loteria/megasena/ultimo'
@@ -43,7 +41,6 @@ def carregar_ultimos_concursos(qtd=10):
             dados = r.json()
             dezenas = [int(d) for d in dados.get('listaDezenas', [])]
             concursos.append((numero, dezenas))
-
     except Exception as e:
         st.error(f"Erro ao carregar concursos: {e}")
     return concursos
@@ -52,22 +49,17 @@ def comparar_com_ultimo(cartao, resultado):
     acertos = set(cartao) & set(resultado)
     return sorted(acertos), len(acertos)
 
-# ================== CABEÇALHO ==================
 st.markdown("<h1 style='text-align: center;'>🎯 Mega-Sena Inteligente</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center;'>Gerador de cartões, estatísticas e probabilidade com base em dados reais</p>", unsafe_allow_html=True)
 
-# ================== OPÇÕES DO USUÁRIO ==================
 quantidade = st.slider("🎫 Quantos cartões deseja gerar?", 1, 10, 1)
 escolhas_usuario = st.multiselect("🔢 Escolha suas dezenas fixas (opcional):", list(range(1, 61)))
 
-# ================== CARREGAR RESULTADOS REAIS ==================
 ultimos_resultados = carregar_ultimos_concursos()
 
-# ================== HISTÓRICO DE JOGOS ==================
 if "historico" not in st.session_state:
     st.session_state.historico = []
 
-# ================== GERADOR DE CARTÕES ==================
 def gerar_cartoes_com_base(escolhas_usuario, qtd):
     dezenas_reais = [dez for _, dez in ultimos_resultados]
     todas = [n for sub in dezenas_reais for n in sub]
@@ -108,14 +100,12 @@ if st.button("🎰 Gerar Cartões"):
                 texto += f" | 🎯 {qtd} acertos: {', '.join(map(str, acertos)) if acertos else 'nenhum'}"
             st.success(texto)
 
-# ================== EXIBIR ÚLTIMOS RESULTADOS ==================
 st.markdown("---")
 st.subheader("🎲 Últimos 10 Resultados da Mega-Sena (Reais)")
 
 for concurso, dezenas in ultimos_resultados:
     st.markdown(f"**Concurso {concurso}:** {' - '.join(f'{d:02}' for d in dezenas)}")
 
-# ================== ESTATÍSTICAS ==================
 st.markdown("---")
 st.subheader("📊 Estatísticas com Base nos Últimos 10 Concursos Reais")
 
@@ -133,7 +123,6 @@ st.write("🔻 Dezenas menos sorteadas:")
 for dezena, freq in menos_sorteadas:
     st.write(f"Dezena {dezena:02} apareceu {freq} vezes.")
 
-# Gráfico
 contagem = Counter(todas_dezenas)
 dezenas_ordenadas = sorted(contagem.keys())
 frequencias = [contagem[d] for d in dezenas_ordenadas]
@@ -145,23 +134,24 @@ ax.set_xlabel("Dezenas")
 ax.set_ylabel("Frequência")
 st.pyplot(fig)
 
-# ================== ESTATÍSTICAS AVANÇADAS ==================
 st.markdown("---")
 st.subheader("📈 Estatísticas Avançadas")
 
 if ultimos_resultados:
-    # Usando os resultados reais para análises
-    todas_dezenas = [num for _, dezenas in ultimos_resultados for num in dezenas]
+    dezenas_atuais = [d for _, d in ultimos_resultados]
+    todas_dezenas = [n for sub in dezenas_atuais for n in sub]
+    ultimo_concurso = ultimos_resultados[0][1] if ultimos_resultados else []
+    penultimo_concurso = ultimos_resultados[1][1] if len(ultimos_resultados) > 1 else []
 
     pares, impares = pares_impares(todas_dezenas)
     soma = soma_total(todas_dezenas)
     primos_list = primos(todas_dezenas)
     fib_list = fibonacci(todas_dezenas)
     quad_perfeitos = quadrados_perfeitos(todas_dezenas)
-    repetidas = repetidas_concurso_anterior(ultimos_resultados)
-    distribuicao = distribuicao_linhas_colunas(ultimos_resultados)
-    sequencias = encontrar_sequencias(ultimos_resultados)
-    duplas, triplas = contar_duplas_triplas(ultimos_resultados)
+    repetidas = repetidas_concurso_anterior(ultimo_concurso, penultimo_concurso)
+    linhas, colunas = distribuicao_linhas_colunas(todas_dezenas)
+    sequencias = encontrar_sequencias(todas_dezenas)
+    duplas, triplas = contar_duplas_triplas(todas_dezenas)
 
     st.write(f"🔢 Pares: {pares} | Ímpares: {impares}")
     st.write(f"➕ Soma total das dezenas: {soma}")
@@ -169,14 +159,14 @@ if ultimos_resultados:
     st.write(f"🔮 Dezenas Fibonacci: {', '.join(map(str, fib_list))}")
     st.write(f"🔲 Quadrados Perfeitos: {', '.join(map(str, quad_perfeitos))}")
     st.write(f"🔄 Dezenas repetidas do último concurso: {', '.join(map(str, repetidas))}")
-    st.write(f"📊 Distribuição por linhas e colunas: {distribuicao}")
+    st.write(f"📊 Distribuição por linhas: {linhas}")
+    st.write(f"📊 Distribuição por colunas: {colunas}")
     st.write(f"🔗 Sequências encontradas: {sequencias}")
     st.write(f"📈 Duplas: {duplas} | Triplas: {triplas}")
 
 else:
     st.info("Não há resultados suficientes para análises avançadas.")
 
-# ================== EXPORTAR CARTÕES ==================
 st.markdown("---")
 st.subheader("📥 Exportar Jogos")
 
@@ -193,6 +183,5 @@ if st.session_state.historico:
 else:
     st.info("Gere pelo menos um cartão para exportar.")
 
-# ================== RODAPÉ ==================
 st.markdown("---")
 st.markdown("<p style='text-align: center; font-size: 14px;'>Desenvolvido por <strong>SAMUCJ TECHNOLOGY</strong> 💡</p>", unsafe_allow_html=True)
