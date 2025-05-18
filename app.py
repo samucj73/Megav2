@@ -11,7 +11,8 @@ from mega_estatisticas import (
     pares_impares, soma_total, primos, fibonacci,
     quadrados_perfeitos, repetidas_concurso_anterior,
     distribuicao_linhas_colunas, encontrar_sequencias,
-    contar_duplas_triplas
+    contar_duplas_triplas, contar_multiplos,
+    contar_finais, contar_faixas, contar_altas_baixas
 )
 
 st.set_page_config(page_title="Mega-Sena Inteligente", layout="centered")
@@ -147,24 +148,32 @@ if len(ultimos_resultados) >= 2:
     fib_list = fibonacci(todas_dezenas)
     quad_perfeitos = quadrados_perfeitos(todas_dezenas)
 
-    ultimo = ultimos_resultados[-1][1]
-    penultimo = ultimos_resultados[-2][1]
+    ultimo, penultimo = dezenas_reais[-1], dezenas_reais[-2]
     repetidas = repetidas_concurso_anterior(ultimo, penultimo)
 
     linhas, colunas = distribuicao_linhas_colunas(todas_dezenas)
     sequencias = encontrar_sequencias(todas_dezenas)
     duplas, triplas = contar_duplas_triplas(todas_dezenas)
 
+    multiplos = contar_multiplos(todas_dezenas)
+    finais = contar_finais(todas_dezenas)
+    faixas = contar_faixas(todas_dezenas)
+    altas, baixas = contar_altas_baixas(todas_dezenas)
+
     st.write(f"🔢 Pares: {pares} | Ímpares: {impares}")
     st.write(f"➕ Soma total das dezenas: {soma}")
     st.write(f"⭐ Dezenas Primas: {', '.join(map(str, primos_list))}")
     st.write(f"🔮 Dezenas Fibonacci: {', '.join(map(str, fib_list))}")
     st.write(f"🔲 Quadrados Perfeitos: {', '.join(map(str, quad_perfeitos))}")
-    st.write(f"🔄 Dezenas repetidas do último para o penúltimo concurso: {', '.join(map(str, repetidas))}")
+    st.write(f"🔄 Repetidas do último para o penúltimo concurso: {', '.join(map(str, repetidas))}")
     st.write(f"📊 Distribuição por linhas: {linhas}")
     st.write(f"📊 Distribuição por colunas: {colunas}")
     st.write(f"🔗 Sequências encontradas: {sequencias}")
     st.write(f"📈 Duplas: {duplas} | Triplas: {triplas}")
+    st.write(f"🧮 Múltiplos: {multiplos}")
+    st.write(f"🔟 Finais das dezenas: {finais}")
+    st.write(f"📉 Faixas (1-20 | 21-40 | 41-60): {faixas}")
+    st.write(f"📊 Altas (31-60): {altas} | Baixas (1-30): {baixas}")
 else:
     st.info("Não há resultados suficientes para análises avançadas.")
 
@@ -180,9 +189,4 @@ if st.session_state.historico:
     with col2:
         if st.button("⬇️ Exportar .PDF"):
             caminho = exportar_pdf(st.session_state.historico)
-            st.success(f"Arquivo salvo como: {caminho}")
-else:
-    st.info("Gere pelo menos um cartão para exportar.")
-
-st.markdown("---")
-st.markdown("<p style='text-align: center; font-size: 14px;'>Desenvolvido por <strong>SAMUCJ TECHNOLOGY</strong> 💡</p>", unsafe_allow_html=True)
+            st.success
