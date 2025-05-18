@@ -7,8 +7,11 @@ import random
 from gerador_megasena import gerar_cartoes
 from util import exportar_pdf, exportar_txt
 from mega_estatisticas import (
-    dezenas_mais_sorteadas,
-    dezenas_menos_sorteadas,
+    dezenas_mais_sorteadas, dezenas_menos_sorteadas,
+    pares_impares, soma_total, primos, fibonacci,
+    quadrados_perfeitos, repetidas_concurso_anterior,
+    distribuicao_linhas_colunas, encontrar_sequencias,
+    contar_duplas_triplas
 )
 
 # ================== CONFIGURAÇÕES ==================
@@ -30,7 +33,6 @@ def carregar_ultimos_concursos(qtd=10):
     concursos = []
     try:
         url_base = 'https://api.guidi.dev.br/loteria/megasena/'
-        # Obtém o número do último concurso
         response = requests.get(url_base + 'ultimo')
         response.raise_for_status()
         ultimo = response.json().get('numero')
@@ -142,6 +144,37 @@ ax.set_title("Frequência das Dezenas - Últimos 10 Concursos")
 ax.set_xlabel("Dezenas")
 ax.set_ylabel("Frequência")
 st.pyplot(fig)
+
+# ================== ESTATÍSTICAS AVANÇADAS ==================
+st.markdown("---")
+st.subheader("📈 Estatísticas Avançadas")
+
+if ultimos_resultados:
+    # Usando os resultados reais para análises
+    todas_dezenas = [num for _, dezenas in ultimos_resultados for num in dezenas]
+
+    pares, impares = pares_impares(todas_dezenas)
+    soma = soma_total(todas_dezenas)
+    primos_list = primos(todas_dezenas)
+    fib_list = fibonacci(todas_dezenas)
+    quad_perfeitos = quadrados_perfeitos(todas_dezenas)
+    repetidas = repetidas_concurso_anterior(ultimos_resultados)
+    distribuicao = distribuicao_linhas_colunas(ultimos_resultados)
+    sequencias = encontrar_sequencias(ultimos_resultados)
+    duplas, triplas = contar_duplas_triplas(ultimos_resultados)
+
+    st.write(f"🔢 Pares: {pares} | Ímpares: {impares}")
+    st.write(f"➕ Soma total das dezenas: {soma}")
+    st.write(f"⭐ Dezenas Primas: {', '.join(map(str, primos_list))}")
+    st.write(f"🔮 Dezenas Fibonacci: {', '.join(map(str, fib_list))}")
+    st.write(f"🔲 Quadrados Perfeitos: {', '.join(map(str, quad_perfeitos))}")
+    st.write(f"🔄 Dezenas repetidas do último concurso: {', '.join(map(str, repetidas))}")
+    st.write(f"📊 Distribuição por linhas e colunas: {distribuicao}")
+    st.write(f"🔗 Sequências encontradas: {sequencias}")
+    st.write(f"📈 Duplas: {duplas} | Triplas: {triplas}")
+
+else:
+    st.info("Não há resultados suficientes para análises avançadas.")
 
 # ================== EXPORTAR CARTÕES ==================
 st.markdown("---")
