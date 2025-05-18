@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def obter_ultimo_resultado():
-    url = 'https://www.megasena.com.br/'
+    url = 'https://api.guidi.dev.br/loteria/megasena/ultimo'
     response = requests.get(url)
     response.raise_for_status()
 
