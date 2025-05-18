@@ -34,8 +34,12 @@ def fibonacci(dezenas):
 def quadrados_perfeitos(dezenas):
     return [d for d in dezenas if int(math.sqrt(d))**2 == d]
 
-def repetidas_concurso_anterior(dezenas, anterior):
-    return sorted(set(dezenas) & set(anterior))
+def repetidas_concurso_anterior(dezenas, ultimos_resultados):
+    if not ultimos_resultados:
+        return []
+    # Obtém as dezenas do último concurso
+    _, dezenas_ultimo = ultimos_resultados[0]
+    return sorted(set(dezenas) & set(dezenas_ultimo))
 
 def distribuicao_linhas_colunas(dezenas):
     linhas = {i: 0 for i in range(1, 7)}   # linhas 1 a 6
