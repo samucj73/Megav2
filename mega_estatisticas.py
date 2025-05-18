@@ -35,27 +35,32 @@ def fibonacci(dezenas):
 def quadrados_perfeitos(dezenas):
     return [d for d in dezenas if int(math.sqrt(d))**2 == d]
 
-def repetidas_concurso_anterior(dezenas_reais):
-    if len(dezenas_reais) < 2:
+def repetidas_concurso_anterior(ultimos_resultados):
+    if len(ultimos_resultados) < 2:
         return []
-    atual = set(dezenas_reais[-1])
-    anterior = set(dezenas_reais[-2])
-    return sorted(atual & anterior)
+    try:
+        atual = set(ultimos_resultados[-1][1])
+        anterior = set(ultimos_resultados[-2][1])
+        return sorted(atual & anterior)
+    except Exception:
+        return []
 
-def distribuicao_linhas_colunas(dezenas_reais):
-    linhas = {i: 0 for i in range(1, 7)}   # linhas 1 a 6
-    colunas = {i: 0 for i in range(1, 11)} # colunas 1 a 10
-    for d in dezenas_reais:
+def distribuicao_linhas_colunas(ultimos_resultados):
+    linhas = {i: 0 for i in range(1, 7)}
+    colunas = {i: 0 for i in range(1, 11)}
+    todas_dezenas = [d for _, dezenas in ultimos_resultados for d in dezenas]
+    for d in todas_dezenas:
         linha = ((d - 1) // 10) + 1
         coluna = ((d - 1) % 10) + 1
         linhas[linha] += 1
         colunas[coluna] += 1
     return linhas, colunas
 
-def encontrar_sequencias(dezenas_reais):
-    dezenas = sorted(dezenas_reais)
+def encontrar_sequencias(ultimos_resultados):
+    todas_dezenas = [d for _, dezenas in ultimos_resultados for d in dezenas]
+    dezenas = sorted(todas_dezenas)
     sequencias = []
-    seq = [dezenas[0]]
+    seq = [dezenas[0]] if dezenas else []
     for i in range(1, len(dezenas)):
         if dezenas[i] == dezenas[i - 1] + 1:
             seq.append(dezenas[i])
@@ -67,9 +72,10 @@ def encontrar_sequencias(dezenas_reais):
         sequencias.append(seq)
     return sequencias
 
-def contar_duplas_triplas(dezenas_reais):
+def contar_duplas_triplas(ultimos_resultados):
+    todas_dezenas = [d for _, dezenas in ultimos_resultados for d in dezenas]
     linhas, colunas = {}, {}
-    for d in dezenas_reais:
+    for d in todas_dezenas:
         linha = ((d - 1) // 10) + 1
         coluna = ((d - 1) % 10) + 1
         linhas.setdefault(linha, []).append(d)
