@@ -23,10 +23,8 @@ def soma_total(dezenas):
     return sum(dezenas)
 
 def primos(dezenas):
-    primos_set = {
-        2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
-        31, 37, 41, 43, 47, 53, 59
-    }
+    primos_set = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
+                  31, 37, 41, 43, 47, 53, 59}
     return [d for d in dezenas if d in primos_set]
 
 def fibonacci(dezenas):
@@ -75,33 +73,32 @@ def contar_duplas_triplas(dezenas):
     triplas = sum(1 for grupo in list(linhas.values()) + list(colunas.values()) if len(grupo) == 3)
     return duplas, triplas
 
-# NOVAS FUNÇÕES AVANÇADAS
-
-def multiplos(dezenas, base):
-    return [d for d in dezenas if d % base == 0]
-
-def finais(dezenas):
-    finais_contagem = {i: 0 for i in range(10)}
+def contar_multiplos(dezenas):
+    multiplos = {2: 0, 3: 0, 5: 0}
     for d in dezenas:
-        finais_contagem[d % 10] += 1
-    return finais_contagem
+        for m in multiplos:
+            if d % m == 0:
+                multiplos[m] += 1
+    return multiplos
 
-def distribuicao_faixas(dezenas):
-    faixas = {
-        "1–20": 0,
-        "21–40": 0,
-        "41–60": 0
-    }
+def contar_finais(dezenas):
+    finais = {i: 0 for i in range(10)}
+    for d in dezenas:
+        finais[d % 10] += 1
+    return finais
+
+def contar_faixas(dezenas):
+    faixas = {"1-20": 0, "21-40": 0, "41-60": 0}
     for d in dezenas:
         if 1 <= d <= 20:
-            faixas["1–20"] += 1
+            faixas["1-20"] += 1
         elif 21 <= d <= 40:
-            faixas["21–40"] += 1
-        elif 41 <= d <= 60:
-            faixas["41–60"] += 1
+            faixas["21-40"] += 1
+        else:
+            faixas["41-60"] += 1
     return faixas
 
-def altas_baixas(dezenas):
-    altas = [d for d in dezenas if d > 30]
-    baixas = [d for d in dezenas if d <= 30]
-    return len(altas), len(baixas)
+def contar_altas_baixas(dezenas):
+    altas = sum(1 for d in dezenas if d >= 31)
+    baixas = len(dezenas) - altas
+    return altas, baixas
