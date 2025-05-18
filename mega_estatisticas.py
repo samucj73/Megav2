@@ -1,3 +1,4 @@
+
 from collections import Counter
 import math
 
@@ -42,12 +43,9 @@ def repetidas_concurso_anterior(dezenas_reais):
     return sorted(atual & anterior)
 
 def distribuicao_linhas_colunas(dezenas_reais):
-    if not dezenas_reais:
-        return {}, {}
-    dezenas = dezenas_reais[-1]
-    linhas = {i: 0 for i in range(1, 7)}
-    colunas = {i: 0 for i in range(1, 11)}
-    for d in dezenas:
+    linhas = {i: 0 for i in range(1, 7)}   # linhas 1 a 6
+    colunas = {i: 0 for i in range(1, 11)} # colunas 1 a 10
+    for d in dezenas_reais:
         linha = ((d - 1) // 10) + 1
         coluna = ((d - 1) % 10) + 1
         linhas[linha] += 1
@@ -55,9 +53,7 @@ def distribuicao_linhas_colunas(dezenas_reais):
     return linhas, colunas
 
 def encontrar_sequencias(dezenas_reais):
-    if not dezenas_reais:
-        return []
-    dezenas = sorted(dezenas_reais[-1])
+    dezenas = sorted(dezenas_reais)
     sequencias = []
     seq = [dezenas[0]]
     for i in range(1, len(dezenas)):
@@ -72,11 +68,8 @@ def encontrar_sequencias(dezenas_reais):
     return sequencias
 
 def contar_duplas_triplas(dezenas_reais):
-    if not dezenas_reais:
-        return 0, 0
-    dezenas = dezenas_reais[-1]
     linhas, colunas = {}, {}
-    for d in dezenas:
+    for d in dezenas_reais:
         linha = ((d - 1) // 10) + 1
         coluna = ((d - 1) % 10) + 1
         linhas.setdefault(linha, []).append(d)
