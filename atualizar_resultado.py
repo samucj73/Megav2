@@ -1,19 +1,13 @@
-
 import requests
-from bs4 import BeautifulSoup
 
 def obter_ultimo_resultado():
     url = 'https://api.guidi.dev.br/loteria/megasena/ultimo'
     response = requests.get(url)
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    # Busca os números da mega
-    numeros_div = soup.find_all('li', class_='resultado-loteria__numero')
-    if not numeros_div:
-        # alternativa se mudar o site
-        numeros_div = soup.select('div.resultados > ul > li')
-    numeros = [int(n.get_text(strip=True)) for n in numeros_div]
+    dados = response.json()
+    dezenas = dados.get('listaDezenas', [])
+    numeros = [int(dezena) for dezena in dezenas]
     return numeros
 
 def salvar_resultado():
